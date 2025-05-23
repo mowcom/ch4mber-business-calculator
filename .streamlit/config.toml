@@ -6,9 +6,10 @@ textColor = "#FAFAFA"
 font = "sans serif"
 
 [server]
-enableStaticServing = true
-runOnSave = true
+enableStaticServing = false
+runOnSave = false
 maxUploadSize = 200
+enableCORS = false
 
 [browser]
 gatherUsageStats = false 

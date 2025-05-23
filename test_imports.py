@@ -1,61 +1,53 @@
 #!/usr/bin/env python3
 """
-Test script to verify all required imports work correctly
+Test script to verify all dependencies can be imported.
+Run this locally and on deployment to debug import issues.
 """
 
-print("Testing imports...")
+import sys
+print(f"Python version: {sys.version}")
 
 try:
-    print("Testing streamlit...")
     import streamlit as st
-    print(f"✓ streamlit {st.__version__}")
+    print("✅ streamlit imported successfully")
+    print(f"   Streamlit version: {st.__version__}")
 except ImportError as e:
-    print(f"✗ streamlit failed: {e}")
+    print(f"❌ streamlit import failed: {e}")
 
 try:
-    print("Testing pandas...")
     import pandas as pd
-    print(f"✓ pandas {pd.__version__}")
+    print("✅ pandas imported successfully")
+    print(f"   Pandas version: {pd.__version__}")
 except ImportError as e:
-    print(f"✗ pandas failed: {e}")
+    print(f"❌ pandas import failed: {e}")
 
 try:
-    print("Testing plotly...")
     import plotly
     import plotly.express as px
     import plotly.graph_objects as go
-    print(f"✓ plotly {plotly.__version__}")
+    print("✅ plotly imported successfully")
+    print(f"   Plotly version: {plotly.__version__}")
 except ImportError as e:
-    print(f"✗ plotly failed: {e}")
+    print(f"❌ plotly import failed: {e}")
 
 try:
-    print("Testing numpy...")
     import numpy as np
-    print(f"✓ numpy {np.__version__}")
+    print("✅ numpy imported successfully") 
+    print(f"   Numpy version: {np.__version__}")
 except ImportError as e:
-    print(f"✗ numpy failed: {e}")
+    print(f"❌ numpy import failed: {e}")
 
 try:
-    print("Testing numpy_financial...")
     import numpy_financial as npf
-    print(f"✓ numpy_financial {npf.__version__}")
+    print("✅ numpy-financial imported successfully")
 except ImportError as e:
-    print(f"✗ numpy_financial failed: {e}")
+    print(f"❌ numpy-financial import failed: {e}")
 
 try:
-    print("Testing reportlab...")
-    from reportlab.pdfgen import canvas
-    from reportlab.lib.pagesizes import letter
-    print("✓ reportlab")
+    import reportlab
+    print("✅ reportlab imported successfully")
+    print(f"   ReportLab version: {reportlab.Version}")
 except ImportError as e:
-    print(f"✗ reportlab failed: {e}")
+    print(f"❌ reportlab import failed: {e}")
 
-try:
-    print("Testing utils modules...")
-    from utils.finance import calc_credits, economics, create_timeline, calculate_npv, create_cash_flow
-    from utils.credit_calc import compute_credits
-    print("✓ utils modules")
-except ImportError as e:
-    print(f"✗ utils modules failed: {e}")
-
-print("\nAll tests completed!") 
+print("\n🎯 All dependency tests completed!") 

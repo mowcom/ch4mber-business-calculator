@@ -1,6 +1,7 @@
 try:
     import streamlit as st
     import pandas as pd
+    import plotly
     import plotly.express as px
     import plotly.graph_objects as go
     import numpy as np
@@ -14,9 +15,10 @@ try:
     import numpy_financial as npf
 
     from utils.finance import calc_credits, economics, create_timeline, calculate_npv, create_cash_flow
+    from utils.credit_calc import compute_credits
 
-    # Check that all critical libraries are properly imported
-    if not hasattr(px, 'bar'):
+    # Check that all critical libraries are properly loaded
+    if not hasattr(plotly, 'express'):
         st.error("Plotly Express not properly loaded")
     if not hasattr(npf, 'npv'):
         st.error("numpy_financial not properly loaded")
@@ -116,7 +118,7 @@ if "compare_mode" not in st.session_state:
     st.session_state.compare_mode = False  # Default to not comparing
 
 # Main app layout with tabs
-main_tabs = st.tabs(["Inputs", "Results", "Comparison"])
+main_tabs = st.tabs(["Inputs", "Results", "Comparison", "Credit Calculator"])
 
 with main_tabs[0]:  # Inputs tab
     # Scenario Manager
@@ -951,6 +953,27 @@ with main_tabs[2]:  # Comparison tab
             st.warning("Please ensure both scenarios have valid well data.")
     else:
         st.info("Enable comparison mode in the Inputs tab to compare scenarios A and B.")
+
+# Credit Calculator tab
+with main_tabs[3]:  # Credit Calculator tab
+    st.header("💨 CH₄ → CO₂e Credit Calculator")
+    
+    with st.form("credit_form"):
+        leak_lpm = st.number_input("Leak rate (L/min)", min_value=0.0, step=0.1)
+        gwp = st.slider("GWP₁₀₀", 1, 100, 28)
+        period_yr = st.slider("Crediting period (yr)", 1, 100, 50)
+        submitted = st.form_submit_button("Calculate")
+        
+    if submitted:
+        res = compute_credits(leak_lpm, gwp, period_yr)
+        st.markdown("**Calculation steps:**")
+        st.markdown(f"""
+        1. $ \\dot m_{{\\rm CH_4}} = {leak_lpm:.2f}\\times0.000714 = {res['kg_per_min']:.4f}\\;{{\\rm kg/min}}$  
+        2. $ m_{{\\rm CH_4,yr}} = {res['kg_per_min']:.4f}\\times525600/1000 = {res['t_per_yr']:.2f}\\;{{\\rm t/yr}}$  
+        3. $ m_{{\\rm CH_4,period}} = {res['t_per_yr']:.2f}\\times{period_yr} = {res['t_total']:.2f}\\;{{\\rm t}}$  
+        4. $ \\mathrm{{Credits}} = {res['t_total']:.2f}\\times{gwp} = {res['credits']:.2f}\\;\\mathrm{{t\\,CO_2e}}$
+        """)
+        st.metric("Total Credits (t CO₂e)", f"{res['credits']:.0f}")
 
 # Footer
 st.markdown("---")

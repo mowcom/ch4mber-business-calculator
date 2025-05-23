@@ -958,41 +958,100 @@ with main_tabs[2]:  # Comparison tab
 with main_tabs[3]:  # Credit Calculator tab
     st.header("💨 CH₄ → CO₂e Credit Calculator")
     
-    with st.form("credit_form"):
-        leak_lpm = st.number_input("Leak rate (L/min)", min_value=0.0, step=0.1)
-        gwp = st.slider("GWP₁₀₀", 1, 100, 28)
-        period_yr = st.slider("Crediting period (yr)", 1, 100, 50)
-        submitted = st.form_submit_button("Calculate")
-        
+    col1, col2 = st.columns([2, 1])
+    
+    with col1:
+        with st.form("credit_form"):
+            leak_lpm = st.number_input("Leak rate (L/min)", min_value=0.0, value=15.0, step=0.1)
+            gwp = st.slider("GWP₁₀₀", 1, 100, 28)
+            period_yr = st.slider("Crediting period (yr)", 1, 100, 50)
+            submitted = st.form_submit_button("Calculate")
+    
     if submitted:
         res = compute_credits(leak_lpm, gwp, period_yr)
         
         st.markdown("## 1 Detailed calculation steps")
         
+        # Step 1
         st.markdown("### 1. Leak rate → CH₄ mass flow (kg min⁻¹)")
-        st.latex(r"\dot{m}_{\mathrm{CH}_4} = Q_{\mathrm{leak}} \, (\mathrm{L/min}) \times \frac{1 \, \mathrm{m}^3}{1000 \, \mathrm{L}} \times \rho_{\mathrm{CH}_4}")
-        st.markdown(f"where $\\rho_{{\\mathrm{{CH}}_4}} \\approx 0.714 \\, \\mathrm{{kg/m}}^3$ at STP.")
-        st.latex(r"\dot{m}_{\mathrm{CH}_4} = Q_{\mathrm{leak}} \times 0.000714 \quad [\mathrm{kg/min}]")
-        st.markdown(f"$\\dot{{m}}_{{\\mathrm{{CH}}_4}} = {leak_lpm:.2f} \\times 0.000714 = {res['kg_per_min']:.6f} \\, \\mathrm{{kg/min}}$")
         
+        # General formula
+        with st.container():
+            st.markdown("#### Formula:")
+            st.latex(r"\dot{m}_{\mathrm{CH}_4} = Q_{\mathrm{leak}} \, (\mathrm{L/min}) \times \frac{1 \, \mathrm{m}^3}{1000 \, \mathrm{L}} \times \rho_{\mathrm{CH}_4}")
+            st.markdown(f"where $\\rho_{{\\mathrm{{CH}}_4}} \\approx 0.714 \\, \\mathrm{{kg/m}}^3$ at STP.")
+            st.latex(r"\dot{m}_{\mathrm{CH}_4} = Q_{\mathrm{leak}} \times 0.000714 \quad [\mathrm{kg/min}]")
+        
+        # Actual calculation
+        with st.container():
+            st.markdown("#### Calculation:")
+            st.code(f"ṁCH₄ = {leak_lpm:.2f} × 0.000714 = {res['kg_per_min']:.6f} kg/min")
+        
+        st.divider()
+        
+        # Step 2
         st.markdown("### 2. Mass flow → annual CH₄ mass (t CH₄ yr⁻¹)")
-        st.latex(r"m_{\mathrm{CH}_4,\mathrm{yr}} = \dot{m}_{\mathrm{CH}_4} \times 525600 \, \mathrm{min/yr} \,\, / \, 1000 \quad [\mathrm{t/yr}]")
-        st.markdown(f"$m_{{\\mathrm{{CH}}_4,\\mathrm{{yr}}}} = {res['kg_per_min']:.6f} \\times 525600 / 1000 = {res['t_per_yr']:.4f} \\, \\mathrm{{t/yr}}$")
         
+        # General formula
+        with st.container():
+            st.markdown("#### Formula:")
+            st.latex(r"m_{\mathrm{CH}_4,\mathrm{yr}} = \dot{m}_{\mathrm{CH}_4} \times 525600 \, \mathrm{min/yr} \,\, / \, 1000 \quad [\mathrm{t/yr}]")
+        
+        # Actual calculation
+        with st.container():
+            st.markdown("#### Calculation:")
+            st.code(f"mCH₄,yr = {res['kg_per_min']:.6f} × 525600/1000 = {res['t_per_yr']:.4f} t/yr")
+        
+        st.divider()
+        
+        # Step 3
         st.markdown("### 3. Annual → 50 yr crediting period (t CH₄)")
-        st.latex(r"m_{\mathrm{CH}_4,50\mathrm{yr}} = m_{\mathrm{CH}_4,\mathrm{yr}} \times 50 \quad [\mathrm{t}]")
-        st.markdown(f"$m_{{\\mathrm{{CH}}_4,{period_yr}\\mathrm{{yr}}}} = {res['t_per_yr']:.4f} \\times {period_yr} = {res['t_total']:.4f} \\, \\mathrm{{t}}$")
         
+        # General formula
+        with st.container():
+            st.markdown("#### Formula:")
+            st.latex(r"m_{\mathrm{CH}_4,50\mathrm{yr}} = m_{\mathrm{CH}_4,\mathrm{yr}} \times 50 \quad [\mathrm{t}]")
+        
+        # Actual calculation
+        with st.container():
+            st.markdown("#### Calculation:")
+            st.code(f"mCH₄,{period_yr}yr = {res['t_per_yr']:.4f} × {period_yr} = {res['t_total']:.4f} t")
+        
+        st.divider()
+        
+        # Step 4
         st.markdown("### 4. CH₄ mass → CO₂e (t CO₂e)")
         st.markdown("Apply the 100-yr GWP:")
-        st.latex(r"\mathrm{Credits} = m_{\mathrm{CH}_4,50\mathrm{yr}} \times \mathrm{GWP}_{100} = m_{\mathrm{CH}_4,\mathrm{yr}} \times 50 \times 28 \quad [\mathrm{t \, CO_2e}]")
-        st.markdown(f"$\\mathrm{{Credits}} = {res['t_total']:.4f} \\times {gwp} = {res['credits']:.2f} \\, \\mathrm{{t\\,CO_2e}}$")
         
+        # General formula
+        with st.container():
+            st.markdown("#### Formula:")
+            st.latex(r"\mathrm{Credits} = m_{\mathrm{CH}_4,50\mathrm{yr}} \times \mathrm{GWP}_{100} = m_{\mathrm{CH}_4,\mathrm{yr}} \times 50 \times 28 \quad [\mathrm{t \, CO_2e}]")
+        
+        # Actual calculation
+        with st.container():
+            st.markdown("#### Calculation:")
+            st.code(f"Credits = {res['t_total']:.4f} × {gwp} = {res['credits']:.2f} t CO₂e")
+        
+        st.divider()
+        
+        # Step 5
         st.markdown("### 5. Plugging emissions?")
         st.markdown("The **CarbonPath methodology does *not*** explicitly subtract CO₂ from P&A equipment or vehicle use.")
         st.markdown("If you wish, you can layer in a separate \"P&A CO₂ cost\" line later, but it's *not* in the core protocol.")
         
-        st.metric("Total Credits (t CO₂e)", f"{res['credits']:.0f}")
+        # Final result
+        st.success(f"Total Credits: {res['credits']:.0f} t CO₂e")
+        
+        with st.expander("View summary table"):
+            summary_df = pd.DataFrame({
+                "Step": ["1. kg/min", "2. t/yr", "3. t total", "4. Credits"],
+                "Value": [f"{res['kg_per_min']:.6f} kg/min", 
+                         f"{res['t_per_yr']:.4f} t/yr", 
+                         f"{res['t_total']:.4f} t", 
+                         f"{res['credits']:.2f} t CO₂e"]
+            })
+            st.table(summary_df)
 
 # Footer
 st.markdown("---")

@@ -18,16 +18,6 @@ try:
     from utils.finance import calc_credits, economics, create_timeline, calculate_npv, create_cash_flow
     from utils.credit_calc import compute_credits
 
-    # Display version information for debugging
-    st.sidebar.expander("Debug Info", expanded=False).write(f"""
-    - Python: {np.__version__}
-    - Streamlit: {st.__version__}
-    - Plotly: {plotly.__version__}
-    - Pandas: {pd.__version__}
-    - NumPy: {np.__version__}
-    - NumPy-Financial: {npf.__version__}
-    """)
-
     # Check that all critical libraries are properly loaded
     if not hasattr(plotly, 'express'):
         st.error("Plotly Express not properly loaded")
@@ -38,6 +28,28 @@ except Exception as e:
     st.error(f"Error loading dependencies: {str(e)}")
     st.info("Please check the logs for more details")
     st.stop()
+
+# Page configuration - MUST BE FIRST STREAMLIT COMMAND
+st.set_page_config(
+    page_title="Well Plugging Carbon Credits Calculator",
+    page_icon="💰",
+    layout="wide",
+)
+
+# Display version information for debugging (must be after set_page_config)
+with st.sidebar.expander("Debug Info", expanded=False):
+    st.write(f"""
+    - Python: {np.__version__}
+    - Streamlit: {st.__version__}
+    - Plotly: {plotly.__version__}
+    - Pandas: {pd.__version__}
+    - NumPy: {np.__version__}
+    - NumPy-Financial: {npf.__version__}
+    """)
+
+# App title
+st.title("Well Plugging Carbon Credits Calculator")
+st.caption("CarbonPath v1.3, Solution 1 (Direct Measurement)")
 
 # Helper functions
 def format_currency(value, decimals=0):
@@ -64,17 +76,6 @@ def highlight_risk(row):
     elif row["Risk Flag"] == "At Risk":
         return ['background-color: #ffddaa'] * len(row)
     return [''] * len(row)
-
-# Page configuration
-st.set_page_config(
-    page_title="Well Plugging Carbon Credits Calculator",
-    page_icon="💰",
-    layout="wide",
-)
-
-# App title
-st.title("Well Plugging Carbon Credits Calculator")
-st.caption("CarbonPath v1.3, Solution 1 (Direct Measurement)")
 
 # Initialize default scenarios 
 def initialize_default_scenarios():

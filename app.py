@@ -1,17 +1,30 @@
-import streamlit as st
-import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
-import numpy as np
-import os
-import io
-from datetime import datetime, timedelta
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfbase import pdfmetrics
-import base64
+try:
+    import streamlit as st
+    import pandas as pd
+    import plotly.express as px
+    import plotly.graph_objects as go
+    import numpy as np
+    import os
+    import io
+    from datetime import datetime, timedelta
+    from reportlab.pdfgen import canvas
+    from reportlab.lib.pagesizes import letter
+    from reportlab.pdfbase import pdfmetrics
+    import base64
+    import numpy_financial as npf
 
-from utils.finance import calc_credits, economics, create_timeline, calculate_npv, create_cash_flow
+    from utils.finance import calc_credits, economics, create_timeline, calculate_npv, create_cash_flow
+
+    # Check that all critical libraries are properly imported
+    if not hasattr(px, 'bar'):
+        st.error("Plotly Express not properly loaded")
+    if not hasattr(npf, 'npv'):
+        st.error("numpy_financial not properly loaded")
+except Exception as e:
+    import streamlit as st
+    st.error(f"Error loading dependencies: {str(e)}")
+    st.info("Please check the logs for more details")
+    st.stop()
 
 # Helper functions
 def format_currency(value, decimals=0):

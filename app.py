@@ -1,4 +1,5 @@
 try:
+    # Explicitly import all required packages
     import streamlit as st
     import pandas as pd
     import plotly
@@ -16,6 +17,16 @@ try:
 
     from utils.finance import calc_credits, economics, create_timeline, calculate_npv, create_cash_flow
     from utils.credit_calc import compute_credits
+
+    # Display version information for debugging
+    st.sidebar.expander("Debug Info", expanded=False).write(f"""
+    - Python: {np.__version__}
+    - Streamlit: {st.__version__}
+    - Plotly: {plotly.__version__}
+    - Pandas: {pd.__version__}
+    - NumPy: {np.__version__}
+    - NumPy-Financial: {npf.__version__}
+    """)
 
     # Check that all critical libraries are properly loaded
     if not hasattr(plotly, 'express'):
